@@ -70,5 +70,9 @@ public class StudentService {
 
         
     }
+
+    public List<Student> getStudentsByLastName(String lastName){
+        return studentRepository.findByLastNameIgnoreCaseOrderByFirstNameAsc(lastName);
+    }
     
 }

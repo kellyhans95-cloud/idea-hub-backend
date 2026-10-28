@@ -68,6 +68,13 @@ public class CollaborationRequestService {
     }
 
 
+    public List<CollaborationRequest> getCollaborationRequestsByStatus(RequestStatus status){
+        return collaborationRequestRepository.findByStatusOrderByRequestDateAsc(status);
+    }
+
+    public List<CollaborationRequest> getCollaborationRequestsBetween(LocalDate start,LocalDate end){
+        return  collaborationRequestRepository.findByRequestDateBetweenOrderByRequestDateAsc(start, end);
+    }
 
     
 }

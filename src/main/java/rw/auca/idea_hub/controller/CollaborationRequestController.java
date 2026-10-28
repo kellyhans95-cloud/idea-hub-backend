@@ -76,6 +76,20 @@ public class CollaborationRequestController {
         }
         return new ResponseEntity<>(returnedMessage,HttpStatus.OK);
     }
+
+    @GetMapping(value = "/by-status")
+    public ResponseEntity<?> getCollaborationRequestsByStatus(@RequestParam RequestStatus status){
+        return new ResponseEntity<>(collaborationRequestService.getCollaborationRequestsByStatus(status),HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/between")
+    public ResponseEntity<?> getCollaborationRequestsBetween(@RequestParam String start,@RequestParam String end){
+        LocalDate starDate = LocalDate.parse(start);
+        LocalDate enDate = LocalDate.parse(end);
+        return new ResponseEntity<>(collaborationRequestService.getCollaborationRequestsBetween(starDate, enDate), HttpStatus.OK);
+    }
+    
+    
     
     
 

@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.http.MediaType;;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestParam;
+;
 
 
 
@@ -76,6 +78,11 @@ public class StudentController {
         }
     }
     
+    @GetMapping("/by-last-name")
+    public ResponseEntity<?> getStudentsByLastName(@RequestParam String lastName){
+        return new ResponseEntity<>(studentService.getStudentsByLastName(lastName),HttpStatus.OK);
+        
+    }
     
     
 }
