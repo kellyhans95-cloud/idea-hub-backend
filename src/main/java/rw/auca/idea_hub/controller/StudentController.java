@@ -81,8 +81,18 @@ public class StudentController {
     @GetMapping("/by-last-name")
     public ResponseEntity<?> getStudentsByLastName(@RequestParam String lastName){
         return new ResponseEntity<>(studentService.getStudentsByLastName(lastName),HttpStatus.OK);
-        
+
     }
+
+    @GetMapping(value = "/of-project/{projectId}")
+    public ResponseEntity<?> getStudentOfProject(@PathVariable UUID projectId){
+        Optional<List<Student>> students = studentService.getStudentsOfProject(projectId);
+        if (students.isEmpty()) {
+            return new ResponseEntity<>("The project with that id does not exist",HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(students.get(),HttpStatus.OK);
+    }
+    
     
     
 }

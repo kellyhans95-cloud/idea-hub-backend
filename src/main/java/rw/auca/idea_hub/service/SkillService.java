@@ -56,5 +56,9 @@ public class SkillService {
         return "Skill does not exist";
         }
     }
+
+    public List<Skill> getUnusedSkills(){
+        return skillRepository.findUnusedSkills();
+    }
     
 }

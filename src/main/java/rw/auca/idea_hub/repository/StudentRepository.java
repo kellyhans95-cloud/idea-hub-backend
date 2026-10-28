@@ -1,6 +1,8 @@
 package rw.auca.idea_hub.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import rw.auca.idea_hub.domain.Student;
@@ -14,4 +16,11 @@ public interface StudentRepository extends JpaRepository<Student, UUID> {
     Optional<Student> findById(UUID id);
     Optional<Student> findByRegNumber(String regNumber);
     List<Student> findByLastNameIgnoreCaseOrderByFirstNameAsc(String lastName);
+
+    @Query("""
+        SELECT DISTINCT c.student
+        FROM CollaborationRequest c
+        WHERE c.project.id = :projectId
+        """)
+    List<Student>findStudentsByProjectId(@Param("projectId") UUID projectId);
 }

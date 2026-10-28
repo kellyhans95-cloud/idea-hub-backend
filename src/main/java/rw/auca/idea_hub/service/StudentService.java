@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import rw.auca.idea_hub.domain.Student;
+import rw.auca.idea_hub.repository.ProjectRepository;
 import rw.auca.idea_hub.repository.StudentRepository;
 
 @Service 
@@ -15,6 +16,9 @@ public class StudentService {
 
     @Autowired 
     private StudentRepository studentRepository;
+
+    @Autowired 
+    private ProjectRepository projectRepository;
 
     public String saveStudent(Student student) {
         Optional existing = studentRepository.findByRegNumber( student.getRegNumber());
@@ -73,6 +77,14 @@ public class StudentService {
 
     public List<Student> getStudentsByLastName(String lastName){
         return studentRepository.findByLastNameIgnoreCaseOrderByFirstNameAsc(lastName);
+    }
+
+    public Optional<List<Student>> getStudentsOfProject(UUID projectId){
+        if (!projectRepository.existsById(projectId)) {
+            return  Optional.empty();
+            
+        }
+        return Optional.of(studentRepository.findStudentsByProjectId(projectId));
     }
     
 }

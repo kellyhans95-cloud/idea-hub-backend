@@ -66,5 +66,7 @@ public class ProjectService {
         }
     }
 
-    
+    public List<Project> getProjectsByskill(String name){
+        return projectRepository.findProjectsBySkillName(name);
+    }
 }

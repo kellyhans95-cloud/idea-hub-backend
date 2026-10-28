@@ -75,5 +75,11 @@ public class ProjectController {
         }
         return  new ResponseEntity<>(returnedMessage,HttpStatus.OK);
     }
+
+    @GetMapping(value = "/by-skill")
+    public ResponseEntity<?> getProjectBySkill(@RequestParam String name){
+        return new ResponseEntity<>(projectService.getProjectsByskill(name),HttpStatus.OK);
+    }
+    
     
 }

@@ -7,14 +7,18 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 import rw.auca.idea_hub.domain.Workspace;
 import rw.auca.idea_hub.repository.WorkspaceRepository;
 
 @Service 
 public class WorkspaceService {
 
+    
     @Autowired 
     private WorkspaceRepository workspaceRepository;
+
+    
 
     public String saveWorkspace(Workspace workspace) {
         Optional<Workspace> existing = workspaceRepository.findByWorkspaceNumber(workspace.getWorkspaceNumber());
@@ -58,5 +62,9 @@ public class WorkspaceService {
       }else{
         return "Workspace with that id does not exist";
       }
+    }
+
+    public List<Workspace> getFreeWorkspaces(){
+        return  workspaceRepository.findFreeWorkspaces();
     }
 }
