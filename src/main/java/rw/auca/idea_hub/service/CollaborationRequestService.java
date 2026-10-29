@@ -18,8 +18,17 @@ public class CollaborationRequestService {
     private CollaborationRequestRepository collaborationRequestRepository;
 
     public String saveCollaborationRequest(CollaborationRequest collaborationRequest) {
-        collaborationRequestRepository.save(collaborationRequest);
-        return "Collaboration request saved successfully.";
+     if (collaborationRequest.getRequestDate().isBefore(LocalDate.now())) {
+        return "Collaboration request date cannot be in the past";
+        
+     }
+     if (collaborationRequestRepository.existsByProjectAndRequestDateAndStatusNot(collaborationRequest.getProject(), collaborationRequest.getRequestDate(),RequestStatus.REJECTED)) {
+        return "Project already received a request on that date";
+        
+     }
+     collaborationRequest.setStatus(RequestStatus.PENDING);
+     collaborationRequestRepository.save(collaborationRequest);
+     return "Collaboration request saved successfully";
    
     }
 
@@ -57,6 +66,29 @@ public class CollaborationRequestService {
         return "Collaboration request updated successfully.";
         
 
+    }
+
+    public String updateCollaborationRequestStatus(UUID id ,RequestStatus newStatus){
+        Optional<CollaborationRequest> existing = collaborationRequestRepository.findById(id);
+        if (existing.isEmpty()) {
+            return "The collaboration request with that id does not exist";            
+        }
+        CollaborationRequest request = existing.get();
+        RequestStatus current = request.getStatus();
+        boolean allowed = false;
+        if (current == RequestStatus.PENDING
+            &&(newStatus == RequestStatus.REVIEWING || newStatus == RequestStatus.REJECTED)){
+                allowed = true;
+        }else if (current == RequestStatus.REVIEWING
+            && (newStatus == RequestStatus.ACCEPTED || newStatus == RequestStatus.REJECTED)){
+                allowed = true;
+        }
+        if (!allowed) {
+            return "Cannot change status from " + current + "to" + newStatus;
+        }
+        request.setStatus(newStatus);
+        collaborationRequestRepository.save(request);
+        return "Collaboration request status updated successfully";        
     }
 
     public Optional<CollaborationRequest> getCollaborationRequestById(UUID id) {

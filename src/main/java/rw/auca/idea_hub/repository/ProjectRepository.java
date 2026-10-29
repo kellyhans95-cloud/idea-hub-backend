@@ -6,6 +6,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import rw.auca.idea_hub.domain.Project;
+import rw.auca.idea_hub.domain.Workspace;
+
 import java.util.UUID;
 import java.util.List;
 import java.util.Optional;
@@ -25,4 +27,5 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
     """)
     List<Project> findProjectsBySkillName(@Param("name") String name);
     
+    boolean existsByWorkspace(Workspace workspace);
 }

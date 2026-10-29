@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 
@@ -36,9 +37,14 @@ public class CollaborationRequestController {
     @PostMapping(value = "/save",consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> saveCollaborationRequest(@RequestBody CollaborationRequest collaborationRequest){ 
-        String returnMessage=collaborationRequestService.saveCollaborationRequest(collaborationRequest);
-        return new ResponseEntity<>(returnMessage,HttpStatus.CREATED);
-
+       String returnedMessage = collaborationRequestService.saveCollaborationRequest(collaborationRequest);
+       if ("Collaboration request date cannot be in the past".equals(returnedMessage)) {
+        return new ResponseEntity<>(returnedMessage,HttpStatus.BAD_REQUEST);
+        
+       }else if ("Project already received a request on that date".equals(returnedMessage)) {
+        return new ResponseEntity<>(returnedMessage,HttpStatus.CONFLICT);
+       }
+       return  new ResponseEntity<>(returnedMessage,HttpStatus.CREATED);
         }
 
     @GetMapping(value = "/all")
@@ -68,6 +74,17 @@ public class CollaborationRequestController {
         return new ResponseEntity<>(returnedMessage,HttpStatus.OK);
         }
 
+    @PatchMapping (value = "/{id}/status")
+    public ResponseEntity<?> updateCollaborationRequestStatus(@PathVariable UUID id,@RequestParam RequestStatus status){
+        String returnedMessage = collaborationRequestService.updateCollaborationRequestStatus(id, status);
+        if ("The collaboration request with that id does not exist".equals(returnedMessage)) {
+            return new ResponseEntity<>(returnedMessage,HttpStatus.NOT_FOUND);            
+        }else if (returnedMessage.startsWith("Cannot change status from")) {
+            return new ResponseEntity<>(returnedMessage,HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(returnedMessage,HttpStatus.OK);
+    }
+
     @DeleteMapping (value ="/delete/{id}")
     public ResponseEntity<?> deleteCollaborationRequest(@PathVariable UUID id){
         String returnedMessage = collaborationRequestService.deleteCollaborationRequestById(id);
@@ -76,6 +93,7 @@ public class CollaborationRequestController {
         }
         return new ResponseEntity<>(returnedMessage,HttpStatus.OK);
     }
+    
 
     @GetMapping(value = "/by-status")
     public ResponseEntity<?> getCollaborationRequestsByStatus(@RequestParam RequestStatus status){

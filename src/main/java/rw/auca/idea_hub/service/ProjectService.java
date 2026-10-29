@@ -8,13 +8,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import rw.auca.idea_hub.domain.Project;
+import rw.auca.idea_hub.domain.Skill;
+import rw.auca.idea_hub.domain.Workspace;
 import rw.auca.idea_hub.repository.ProjectRepository;
+import rw.auca.idea_hub.repository.SkillRepository;
+import rw.auca.idea_hub.repository.WorkspaceRepository;
 
 @Service 
 public class ProjectService {
     
     @Autowired 
     private ProjectRepository projectRepository;
+    @Autowired 
+    private SkillRepository skillRepository;
+    @Autowired 
+    private WorkspaceRepository workspaceRepository;
 
     public String saveProject(Project project) {
         Optional<Project> existing = projectRepository.findByTitleAndOwnerName(project.getTitle(), project.getOwnerName());
@@ -68,5 +76,43 @@ public class ProjectService {
 
     public List<Project> getProjectsByskill(String name){
         return projectRepository.findProjectsBySkillName(name);
+    }
+
+    public String addSkillToProject(UUID projectId,UUID skillId){
+        Optional<Project> projectOpt = projectRepository.findById(projectId);
+        if (projectOpt.isEmpty()) {
+            return "The project with that does not exist";
+        }
+        Optional<Skill> skillopt = skillRepository.findById(skillId);
+        if (skillopt.isEmpty()) {
+            return "That skill does not exist";
+        }
+        Project project = projectOpt.get();
+        if (project.getRequiredSkills().contains(skillopt.get())) {
+            return "The project already has that skill";
+        }
+        project.getRequiredSkills().add(skillopt.get());
+        projectRepository.save(project);
+        return "Skill added to the project";
+    }
+
+    public String changeProjectWorkspace(UUID projectId,Integer workspaceNumber){
+        Optional<Project> projectOpt = projectRepository.findById(projectId);
+        if (projectOpt.isEmpty()) {
+            return "The project with that id does not exist";
+        }
+        Optional<Workspace> workspaceOpt = workspaceRepository.findByWorkspaceNumber(workspaceNumber);
+        if (workspaceOpt.isEmpty()) {
+            return "The workspace with that workspaceNumber does not exist";
+        }
+        Project project = projectOpt.get();
+        Workspace workspace = workspaceOpt.get();
+        boolean alreadyThere = project.getWorkspace() != null && project.getWorkspace().getId().equals(workspace.getId());
+        if (!alreadyThere && projectRepository.existsByWorkspace(workspace)) {
+            return "The workspace is taken by another project";
+        }
+        project.setWorkspace(workspace);
+        projectRepository.save(project);
+        return "Workspace changed successfully";
     }
 }

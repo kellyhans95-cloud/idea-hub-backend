@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -79,6 +80,28 @@ public class ProjectController {
     @GetMapping(value = "/by-skill")
     public ResponseEntity<?> getProjectBySkill(@RequestParam String name){
         return new ResponseEntity<>(projectService.getProjectsByskill(name),HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/{projectId}/skills/{skillId}")
+    public ResponseEntity<?> addskillToProject(@PathVariable UUID projectId,@PathVariable UUID skillId){
+        String returnedMessage = projectService.addSkillToProject(projectId, skillId);
+        if ("The project with that id does not exist".equals(returnedMessage) || "That skill does not exist".equals(returnedMessage)) {
+            return new ResponseEntity<>(returnedMessage,HttpStatus.NOT_FOUND);
+        }else if ("The project already has that skill".equals(returnedMessage)) {
+            return new ResponseEntity<>(returnedMessage,HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<>(returnedMessage,HttpStatus.OK);
+    }
+
+    @PatchMapping (value = "/{projectId}/workspace")
+    public ResponseEntity<?> changeProjectWorkspace(@PathVariable UUID projectId,@RequestParam Integer workspaceNumber){
+        String returnedMessage = projectService.changeProjectWorkspace(projectId, workspaceNumber);
+        if ("The project with that id does not exist".equals(returnedMessage) || "The workspace with that workspaceNumber does not exist".equals(returnedMessage)) {
+            return new ResponseEntity<>(returnedMessage,HttpStatus.NOT_FOUND);
+        }else if ("That workspace is taken by another project".equals(returnedMessage)) {
+            return new ResponseEntity<>(returnedMessage, HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<>(returnedMessage,HttpStatus.OK);
     }
     
     
