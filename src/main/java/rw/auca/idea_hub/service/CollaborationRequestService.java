@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import rw.auca.idea_hub.domain.CollaborationRequest;
 import rw.auca.idea_hub.domain.RequestStatus;
@@ -114,5 +115,13 @@ public class CollaborationRequestService {
         return  collaborationRequestRepository.findByRequestDateBetweenOrderByRequestDateAsc(start, end);
     }
 
-    
+    public List<Object[]> getRequestStatsByStatus(){
+        return collaborationRequestRepository.countRequestsByStatus();
+    }
+
+    @Transactional 
+    public String cancelRequestsOfProjectOnDate(UUID projectId, LocalDate date){
+        int count = collaborationRequestRepository.cancelRequestsOfProjectOnDate(projectId, date, RequestStatus.REJECTED,RequestStatus.ACCEPTED);
+        return  count + " collaboration request cancelled";
+    }
 }

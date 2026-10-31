@@ -108,6 +108,18 @@ public class CollaborationRequestController {
         LocalDate enDate = LocalDate.parse(end);
         return new ResponseEntity<>(collaborationRequestService.getCollaborationRequestsBetween(starDate, enDate), HttpStatus.OK);
     }
+
+    @GetMapping(value = "/stats/by-status")
+    public ResponseEntity<?> getRequestStatsByStatus(){
+        return new ResponseEntity<>(collaborationRequestService.getRequestStatsByStatus(),HttpStatus.OK);
+    }
+
+    @PatchMapping (value = "/cancel-day")
+    public ResponseEntity<?> cancelDay(@RequestParam UUID projectId,@RequestParam String date){
+        LocalDate day = LocalDate.parse(date);
+        return new ResponseEntity<>(collaborationRequestService.cancelRequestsOfProjectOnDate(projectId, day),HttpStatus.OK);
+    }
+    
     
     
     
