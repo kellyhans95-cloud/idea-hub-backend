@@ -10,12 +10,15 @@ import org.springframework.stereotype.Service;
 import rw.auca.idea_hub.domain.CollaborationRequest;
 import rw.auca.idea_hub.domain.RequestStatus;
 import rw.auca.idea_hub.repository.CollaborationRequestRepository;
+import rw.auca.idea_hub.repository.MemberAssignmentRepository;
 
 @Service 
 public class CollaborationRequestService {
 
     @Autowired 
     private CollaborationRequestRepository collaborationRequestRepository;
+    @Autowired 
+    private MemberAssignmentRepository memberAssignmentRepository;
 
     public String saveCollaborationRequest(CollaborationRequest collaborationRequest) {
      if (collaborationRequest.getRequestDate().isBefore(LocalDate.now())) {
@@ -34,12 +37,15 @@ public class CollaborationRequestService {
 
     public String deleteCollaborationRequestById(UUID id) {
         Optional<CollaborationRequest> existing = collaborationRequestRepository.findById(id);
-        if (existing.isPresent()) {
-            collaborationRequestRepository.deleteById(id);
-            return "Collaboration request deleted successfully.";
-        } else {
-            return "Collaboration request with that ID does not exist.";
+        if (existing.isEmpty()) {
+            return "The collaboration request with that id does not exist";
         }
+        if (memberAssignmentRepository.existsByCollaborationRequest(existing.get())) {
+            return "That collaboration request has member assignments, delete them first";
+        }
+        collaborationRequestRepository.deleteById(id);
+        return "Collaboration request deleted successfully.";
+       
     }
 
     public String updateCollaborationRequest(UUID id ,CollaborationRequest request){

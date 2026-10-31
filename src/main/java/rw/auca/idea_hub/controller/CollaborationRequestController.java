@@ -90,6 +90,8 @@ public class CollaborationRequestController {
         String returnedMessage = collaborationRequestService.deleteCollaborationRequestById(id);
         if ("The Collaboration request with that id does not exist".equals(returnedMessage)){
               return new ResponseEntity<>(returnedMessage,HttpStatus.NOT_FOUND);
+        }else if ("That collaboration request hes member assignments,delete them first".equals(returnedMessage)) {
+            return new ResponseEntity<>(returnedMessage,HttpStatus.CONFLICT);
         }
         return new ResponseEntity<>(returnedMessage,HttpStatus.OK);
     }
